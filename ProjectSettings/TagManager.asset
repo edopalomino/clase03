@@ -9,6 +9,8 @@ TagManager:
   - Hand
   - Weapon
   - Button
+  - Head
+  - Chase
   layers:
   - Default
   - TransparentFX

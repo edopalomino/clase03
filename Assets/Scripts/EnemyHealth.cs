@@ -1,19 +1,23 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
+/// <summary>
+/// Maneja la salud y el comportamiento del enemigo
+/// </summary>
 public class EnemyHealth : MonoBehaviour
 {
-    public int maxHealth = 100; // Salud máxima del enemigo
-    private int currentHealth;  // Salud actual del enemigo
+    public int maxHealth { get; private set; } = 100; // Salud máxima del enemigo
+    public int currentHealth { get; private set; }  // Salud actual del enemigo
     [SerializeField]
     private Material damage; // MeshRenderer para visualizar el daño
     private Material[] original = new Material[3]; // Material original del enemigo
     [SerializeField]
     private MeshRenderer[] meshRenderer; // MeshRenderer del enemigo
     private Animator animator; // Animator del enemigo
-    [SerializeField]
-    private GameObject dead; 
+    [SerializeField] private GameObject dead;
+    [SerializeField] private Transform spawnPoint;
+    [SerializeField] private GameObject proyectile;
+    [SerializeField] private float[] spawnInterval = { 8, 10};// Intervalo de tiempo entre cada spawn
 
     // Este evento se activará cuando el enemigo muera.
     public delegate void EnemyDied();
@@ -31,6 +35,8 @@ public class EnemyHealth : MonoBehaviour
     void Start()
     {
         currentHealth = maxHealth; // Inicializa la salud actual con la salud máxima
+        float random = Random.Range(spawnInterval[0], spawnInterval[1]); // Genera un número aleatorio entre el intervalo de tiempo
+        InvokeRepeating("SpawnObject", 0f, random);
     }
 
     public void TakeDamage(int damageAmount)
@@ -58,6 +64,13 @@ public class EnemyHealth : MonoBehaviour
         {
             meshRenderer[i].material = original[i]; // Restaura el material original del enemigo
         }
+    }
+
+    void SpawnObject()
+    {
+        // Instanciar el objeto en la posición actual del script
+        animator.Play("attack_ghost");
+        Instantiate(proyectile, spawnPoint.transform.position, spawnPoint.rotation);
     }
 
     void Die()

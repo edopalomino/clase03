@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Button : MonoBehaviour
 {
     private Animator animator;
-    private bool isPressed = false;
+    private bool hasBeenPressed = false;
     public delegate void OnGoPressed();
     public static event OnGoPressed onGoPressed;
     private void Start()
@@ -15,10 +13,10 @@ public class Button : MonoBehaviour
 
     public void OnPress()
     {
-        if(isPressed) return;
+        if(hasBeenPressed) return;
         animator.Play("ButtonPress");
         onGoPressed?.Invoke();
         GetComponent<AudioSource>().Play();
-        isPressed = true;
+        hasBeenPressed = true;
     }
 }

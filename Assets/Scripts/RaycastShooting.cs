@@ -1,17 +1,16 @@
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class RaycastShooting : MonoBehaviour
 {
-    public float range = 100f; // Alcance del disparo
-    public int damage = 10; // Daño que hará el disparo
+    [SerializeField] private float range = 100f; // Alcance del disparo
+    [SerializeField] private int damage = 10; // Daño que hará el disparo
     [SerializeField]
     private TextMeshPro meshPro; // Texto para mostrar la cantidad de municiones
     private int ammo = 999; // Cantidad de municiones
     [SerializeField]
-    public GameObject weapon; // Cámara del jugador para determinar el punto de inicio del raycast
+    private GameObject weapon; // Cámara del jugador para determinar el punto de inicio del raycast
     [SerializeField]
     private InputActionProperty RightClick; // Botón derecho del mouse
     [SerializeField]
@@ -26,16 +25,9 @@ public class RaycastShooting : MonoBehaviour
 
     void Update()
     {
+        // Actualizar posición del LineRenderer
         LineRenderer.SetPosition(0, LineRenderer.transform.position);
         LineRenderer.SetPosition(1, LineRenderer.transform.position + LineRenderer.transform.forward * -1 * range);
-    }
-
-  
-
-    private void UpdateAmmo(int ammo)
-    {
-        this.ammo = ammo;
-        meshPro.text = ammo.ToString();
     }
 
     private void OnEnable()
@@ -68,6 +60,10 @@ public class RaycastShooting : MonoBehaviour
 
     void Shoot()
     {
+        if(ammo <= 0)
+        {
+            return;
+        }
         ammo -= 1;  
         meshPro.text = ammo.ToString();
         RaycastHit hit; // Información sobre lo que golpea el raycast
@@ -81,6 +77,7 @@ public class RaycastShooting : MonoBehaviour
             // Aquí puedes añadir lógica adicional, por ejemplo, reducir la salud de un enemigo
             EnemyHealth enemy = hit.transform.GetComponent<EnemyHealth>();
             Target target = hit.transform.GetComponent<Target>();
+            ChasePlayer chasePlayer = hit.transform.GetComponent<ChasePlayer>();
             if (enemy != null)
             {
                 enemy.TakeDamage(damage);
@@ -89,10 +86,17 @@ public class RaycastShooting : MonoBehaviour
             {
                 target.OnHit(hit.point);
             }
+            if(chasePlayer != null)
+            {
+                chasePlayer.OnHit();
+            }
+
         }
-        else
-        {
-            Instantiate(bullet, hit.point, Quaternion.identity);
-        }
+    }
+
+    private void UpdateAmmo(int ammo)
+    {
+        this.ammo = ammo;
+        meshPro.text = ammo.ToString();
     }
 }
